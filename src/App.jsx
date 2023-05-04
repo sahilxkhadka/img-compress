@@ -1,6 +1,7 @@
 import { useState } from "react";
 import imageCompression from "browser-image-compression";
 import "./App.css";
+import Loader from "./components/Loader";
 
 function App() {
 	const [originalImageFile, setOriginalImageFile] = useState("");
@@ -11,18 +12,18 @@ function App() {
 		const image = e.target.files[0];
 		setOriginalImageFile(image);
 
-		const options = {
-			maxSizeMB: 0.5,
-			maxWidthOrHeight: 1920,
-			useWebWorker: true,
-		};
-		try {
-			const compressedFile = await imageCompression(image, options);
-			setCompressedImageFile(compressedFile);
-			setDownloadLink(URL.createObjectURL(compressedFile));
-		} catch (error) {
-			console.log(error);
-		}
+		// const options = {
+		// 	maxSizeMB: 0.5,
+		// 	maxWidthOrHeight: 1920,
+		// 	useWebWorker: true,
+		// };
+		// try {
+		// 	const compressedFile = await imageCompression(image, options);
+		// 	setCompressedImageFile(compressedFile);
+		// 	setDownloadLink(URL.createObjectURL(compressedFile));
+		// } catch (error) {
+		// 	console.log(error);
+		// }
 	};
 
 	return (
@@ -55,12 +56,13 @@ function App() {
 					</a>
 				</>
 			) : (
-				<div className='w-52 h-56'>
+				<div className='w-80 h-80 my-8 mx-auto relative'>
 					<img
-						className='object-cover'
+						className='w-full object-cover h-full aspect-auto'
 						src={originalImageFile && URL.createObjectURL(originalImageFile)}
 						alt=''
 					/>
+					<Loader />
 				</div>
 			)}
 		</>
