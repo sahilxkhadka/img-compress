@@ -7,23 +7,27 @@ function App() {
 	const [originalImageFile, setOriginalImageFile] = useState("");
 	const [compressedImageFile, setCompressedImageFile] = useState("");
 	const [downloadLink, setDownloadLink] = useState("");
+	const [compressing, setCompressing] = useState(false);
 
 	const handleImageInput = async (e) => {
 		const image = e.target.files[0];
 		setOriginalImageFile(image);
-
-		// const options = {
-		// 	maxSizeMB: 0.5,
-		// 	maxWidthOrHeight: 1920,
-		// 	useWebWorker: true,
-		// };
-		// try {
-		// 	const compressedFile = await imageCompression(image, options);
-		// 	setCompressedImageFile(compressedFile);
-		// 	setDownloadLink(URL.createObjectURL(compressedFile));
-		// } catch (error) {
-		// 	console.log(error);
-		// }
+		setCompressing(true);
+		setTimeout(async () => {
+			const options = {
+				maxSizeMB: 0.5,
+				maxWidthOrHeight: 1920,
+				useWebWorker: true,
+			};
+			try {
+				const compressedFile = await imageCompression(image, options);
+				setCompressedImageFile(compressedFile);
+				setDownloadLink(URL.createObjectURL(compressedFile));
+				setCompressing(false);
+			} catch (error) {
+				console.log(error);
+			}
+		}, 6000);
 	};
 
 	return (
@@ -48,22 +52,16 @@ function App() {
 			>
 				SVG, PNG, JPG or GIF (MAX. 800x400px).
 			</p>
-			{compressedImageFile ? (
+			{compressedImageFile && (
 				<>
 					<img src={URL.createObjectURL(compressedImageFile)} alt='' />
 					<a href={downloadLink} download>
 						Download
 					</a>
 				</>
-			) : (
-				<div className='w-80 h-80 my-8 mx-auto relative'>
-					<img
-						className='w-full object-cover h-full aspect-auto'
-						src={originalImageFile && URL.createObjectURL(originalImageFile)}
-						alt=''
-					/>
-					<Loader />
-				</div>
+			)}
+			{originalImageFile && (
+				  
 			)}
 		</>
 	);
