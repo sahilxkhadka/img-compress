@@ -39,6 +39,9 @@ function App() {
 
 	return (
 		<>
+			<h1 className='animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent text-[48px] font-black my-4'>
+				Image Compressor
+			</h1>
 			<button id='file-input' className='mx-auto' onClick={handleButtonClick}>
 				<svg
 					xmlns='http://www.w3.org/2000/svg'
