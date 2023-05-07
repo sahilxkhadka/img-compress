@@ -44,7 +44,7 @@ function App() {
 					downloadLink: URL.createObjectURL(compressedFile),
 					compressing: false,
 				});
-			}, 2800);
+			}, 2700);
 		} catch (error) {
 			setImageData({
 				...imageData,
