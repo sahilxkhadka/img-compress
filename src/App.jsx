@@ -37,12 +37,14 @@ function App() {
 					)
 				),
 			]);
-			setImageData({
-				...imageData,
-				compressedImageFile: compressedFile,
-				downloadLink: URL.createObjectURL(compressedFile),
-				compressing: false,
-			});
+			setTimeout(() => {
+				setImageData({
+					...imageData,
+					compressedImageFile: compressedFile,
+					downloadLink: URL.createObjectURL(compressedFile),
+					compressing: false,
+				});
+			}, 2800);
 		} catch (error) {
 			setImageData({
 				...imageData,
