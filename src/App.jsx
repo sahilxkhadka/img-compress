@@ -4,49 +4,61 @@ import "./App.css";
 import ImageCard from "./components/ImageCard";
 
 function App() {
-	const [originalImageFile, setOriginalImageFile] = useState("");
-	const [compressedImageFile, setCompressedImageFile] = useState("");
-	const [downloadLink, setDownloadLink] = useState("");
-	const [compressing, setCompressing] = useState(false);
-	const [error, setError] = useState(false);
+	const [imageData, setImageData] = useState({
+		originalImageFile: "",
+		compressedImageFile: "",
+		downloadLink: "",
+		compressing: false,
+		error: false,
+	});
 
 	const fileInputRef = useRef(null);
 
 	const handleImageInput = async (e) => {
 		const image = e.target.files[0];
-		setOriginalImageFile(image);
-		if (typeof image === "object") setCompressing(true);
-		setTimeout(async () => {
-			const options = {
-				maxSizeMB: 0.5,
-				maxWidthOrHeight: 1920,
-				useWebWorker: true,
-			};
-			try {
-				const compressedFile = await Promise.race([
-					imageCompression(image, options),
-					new Promise((_, reject) =>
-						setTimeout(
-							() => reject(new Error("Image compression timed out")),
-							8000
-						)
-					),
-				]);
-				console.log(typeof compressedFile);
-				setCompressedImageFile(compressedFile);
-				setDownloadLink(URL.createObjectURL(compressedFile));
-				setCompressing(false);
-			} catch (error) {
-				setError(true);
-				setCompressedImageFile("");
-				setCompressing(false);
-			}
-		}, 2000);
+		setImageData({
+			...imageData,
+			originalImageFile: image,
+			compressing: typeof image === "object",
+			error: false,
+		});
+		const options = {
+			maxSizeMB: 0.5,
+			maxWidthOrHeight: 1920,
+			useWebWorker: true,
+		};
+		try {
+			const compressedFile = await Promise.race([
+				imageCompression(image, options),
+				new Promise((_, reject) =>
+					setTimeout(
+						() => reject(new Error("Image compression timed out")),
+						7000
+					)
+				),
+			]);
+			setImageData({
+				...imageData,
+				compressedImageFile: compressedFile,
+				downloadLink: URL.createObjectURL(compressedFile),
+				compressing: false,
+			});
+		} catch (error) {
+			setImageData({
+				...imageData,
+				error: true,
+				compressedImageFile: "",
+				compressing: false,
+			});
+		}
 	};
 
 	const handleButtonClick = () => {
-		setCompressedImageFile("");
-		setError(false);
+		setImageData({
+			...imageData,
+			compressedImageFile: "",
+			error: false,
+		});
 		fileInputRef.current?.click();
 	};
 
@@ -77,15 +89,22 @@ function App() {
 				accept='image/*'
 				ref={fileInputRef}
 			/>
-
-			{compressedImageFile ? (
+			{imageData.compressedImageFile ? (
 				<>
-					<ImageCard imageFile={originalImageFile} compressing={compressing} />
+					<ImageCard
+						imageFile={imageData.compressedImageFile}
+						compressing={imageData.compressing}
+					/>
 					<a
-						href={downloadLink}
+						href={imageData.downloadLink}
 						download='compressed'
 						className='download-btn mx-auto'
-						onClick={() => setCompressing(false)}
+						onClick={() =>
+							setImageData({
+								...imageData,
+								compressing: false,
+							})
+						}
 					>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
@@ -105,10 +124,13 @@ function App() {
 			) : (
 				<p className='my-3 text-sm'>SVG, PNG, JPG or GIF.</p>
 			)}
-			{compressing && (
-				<ImageCard imageFile={originalImageFile} compressing={compressing} />
+			{imageData.compressing && (
+				<ImageCard
+					imageFile={imageData.originalImageFile}
+					compressing={imageData.compressing}
+				/>
 			)}
-			{error && (
+			{imageData.error && (
 				<p className='my-3 mx-auto text-base font-medium text-red-500 w-3/5 sm:w-full'>
 					An error occured! Please try again or try adding another image
 				</p>
