@@ -8,6 +8,7 @@ function App() {
 	const [compressedImageFile, setCompressedImageFile] = useState("");
 	const [downloadLink, setDownloadLink] = useState("");
 	const [compressing, setCompressing] = useState(false);
+	const [error, setEroor] = useState(false);
 
 	const fileInputRef = useRef(null);
 
@@ -22,18 +23,30 @@ function App() {
 				useWebWorker: true,
 			};
 			try {
-				const compressedFile = await imageCompression(image, options);
+				const compressedFile = await Promise.race([
+					imageCompression(image, options),
+					new Promise((_, reject) =>
+						setTimeout(
+							() => reject(new Error("Image compression timed out")),
+							8000
+						)
+					),
+				]);
+				console.log(typeof compressedFile);
 				setCompressedImageFile(compressedFile);
 				setDownloadLink(URL.createObjectURL(compressedFile));
 				setCompressing(false);
 			} catch (error) {
-				console.log(error);
+				setEroor(true);
+				setCompressedImageFile("");
+				setCompressing(false);
 			}
-		}, 3000);
+		}, 2000);
 	};
 
 	const handleButtonClick = () => {
 		setCompressedImageFile("");
+		setEroor(false);
 		fileInputRef.current?.click();
 	};
 
@@ -94,6 +107,11 @@ function App() {
 			)}
 			{compressing && (
 				<ImageCard imageFile={originalImageFile} compressing={compressing} />
+			)}
+			{error && (
+				<p className='my-3 mx-auto text-base font-medium text-red-500 w-3/5 sm:w-full'>
+					An erro occured! Please try again or try adding another image
+				</p>
 			)}
 		</>
 	);
