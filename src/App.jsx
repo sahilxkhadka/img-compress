@@ -8,7 +8,7 @@ function App() {
 	const [compressedImageFile, setCompressedImageFile] = useState("");
 	const [downloadLink, setDownloadLink] = useState("");
 	const [compressing, setCompressing] = useState(false);
-	const [error, setEroor] = useState(false);
+	const [error, setError] = useState(false);
 
 	const fileInputRef = useRef(null);
 
@@ -37,7 +37,7 @@ function App() {
 				setDownloadLink(URL.createObjectURL(compressedFile));
 				setCompressing(false);
 			} catch (error) {
-				setEroor(true);
+				setError(true);
 				setCompressedImageFile("");
 				setCompressing(false);
 			}
@@ -46,7 +46,7 @@ function App() {
 
 	const handleButtonClick = () => {
 		setCompressedImageFile("");
-		setEroor(false);
+		setError(false);
 		fileInputRef.current?.click();
 	};
 
@@ -110,7 +110,7 @@ function App() {
 			)}
 			{error && (
 				<p className='my-3 mx-auto text-base font-medium text-red-500 w-3/5 sm:w-full'>
-					An erro occured! Please try again or try adding another image
+					An error occured! Please try again or try adding another image
 				</p>
 			)}
 		</>
