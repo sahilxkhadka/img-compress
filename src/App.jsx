@@ -75,7 +75,7 @@ function App() {
 		if (e.type === "dragenter" || e.type === "dragover") {
 			setDragActive(true);
 		} else if (e.type === "dragleave") {
-			setDragActive(true);
+			setDragActive(false);
 		}
 	};
 
@@ -95,37 +95,43 @@ function App() {
 			</h1>
 			<div className='flex'></div>
 			<form
-				className={`sm:w-96 sm:h-32 bg-gray-400 mx-auto my-4 rounded-lg relative flex flex-col justify-center items-center gap-2 ${
-					dragActive ? "bg-white" : "bg-gray-300"
-				} `}
+				className={`sm:w-96 sm:h-32 mx-auto my-4 rounded-lg relative `}
 				onDragEnter={handleDrag}
 				onSubmit={(e) => {
 					e.preventDefault();
 				}}
 			>
-				<button id='file-input' onClick={handleButtonClick}>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						viewBox='0 0 24 24'
-						width='24'
-						height='24'
-					>
-						<path fill='none' d='M0 0h24v24H0z'></path>
-						<path
-							fill='currentColor'
-							d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'
-						></path>
-					</svg>
-					<span>Add</span>
-				</button>
-				<p className='text-sm'>Drag and Drop File here to upload.</p>
-				<input
-					className='hidden'
-					type='file'
-					onInput={handleImageInput}
-					accept='image/*'
-					ref={fileInputRef}
-				/>
+				<label
+					className={`flex flex-col justify-center items-center w-full h-full rounded-lg transition-all ease-linear ${
+						dragActive
+							? "bg-yellow-600 bg-opacity-60"
+							: "bg-yellow-500 bg-opacity-70"
+					}`}
+				>
+					<button id='file-input' onClick={handleButtonClick}>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							viewBox='0 0 24 24'
+							width='24'
+							height='24'
+						>
+							<path fill='none' d='M0 0h24v24H0z'></path>
+							<path
+								fill='currentColor'
+								d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'
+							></path>
+						</svg>
+						<span>Add</span>
+					</button>
+					<p className='text-sm mt-2'>Drag and Drop File here to upload.</p>
+					<input
+						className='hidden'
+						type='file'
+						onInput={handleImageInput}
+						accept='image/*'
+						ref={fileInputRef}
+					/>
+				</label>
 				{dragActive && (
 					<div
 						className='absolute inset-0 h-full w-full'
