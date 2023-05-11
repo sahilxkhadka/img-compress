@@ -38,15 +38,13 @@ function App() {
 					)
 				),
 			]);
-			setTimeout(() => {
-				setImageData({
-					...imageData,
-					compressedImageFile: compressedFile,
-					downloadLink: URL.createObjectURL(compressedFile),
-					compressing: false,
-				});
-				setDragged(false);
-			}, 2700);
+			setImageData({
+				...imageData,
+				compressedImageFile: compressedFile,
+				downloadLink: URL.createObjectURL(compressedFile),
+				compressing: false,
+			});
+			setDragged(false);
 		} catch (error) {
 			setImageData({
 				...imageData,
