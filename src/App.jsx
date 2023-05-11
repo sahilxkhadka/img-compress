@@ -4,6 +4,7 @@ import "./App.css";
 import ImageCard from "./components/ImageCard";
 
 function App() {
+	const [dragActive, setDragActive] = useState(false);
 	const [imageData, setImageData] = useState({
 		originalImageFile: "",
 		compressedImageFile: "",
@@ -14,8 +15,7 @@ function App() {
 
 	const fileInputRef = useRef(null);
 
-	const handleImageInput = async (e) => {
-		const image = e.target.files[0];
+	const compressImageInput = async (image) => {
 		setImageData({
 			...imageData,
 			originalImageFile: image,
@@ -55,6 +55,11 @@ function App() {
 		}
 	};
 
+	const handleImageInput = (e) => {
+		const image = e.target.files[0];
+		compressImageInput(image);
+	};
+
 	const handleButtonClick = () => {
 		setImageData({
 			...imageData,
@@ -64,33 +69,73 @@ function App() {
 		fileInputRef.current?.click();
 	};
 
+	const handleDrag = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.type === "dragenter" || e.type === "dragover") {
+			setDragActive(true);
+		} else if (e.type === "dragleave") {
+			setDragActive(true);
+		}
+	};
+
+	const handleDrop = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setDragActive(false);
+		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+			compressImageInput(e.dataTransfer.files[0]);
+		}
+	};
+
 	return (
 		<>
 			<h1 className='animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent text-[48px] font-black my-4'>
 				Image Compressor
 			</h1>
-			<button id='file-input' className='mx-auto' onClick={handleButtonClick}>
-				<svg
-					xmlns='http://www.w3.org/2000/svg'
-					viewBox='0 0 24 24'
-					width='24'
-					height='24'
-				>
-					<path fill='none' d='M0 0h24v24H0z'></path>
-					<path
-						fill='currentColor'
-						d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'
-					></path>
-				</svg>
-				<span>Add</span>
-			</button>
-			<input
-				className='hidden'
-				type='file'
-				onInput={handleImageInput}
-				accept='image/*'
-				ref={fileInputRef}
-			/>
+			<div className='flex'></div>
+			<form
+				className={`sm:w-96 sm:h-32 bg-gray-400 mx-auto my-4 rounded-lg relative flex flex-col justify-center items-center gap-2 ${
+					dragActive ? "bg-white" : "bg-gray-300"
+				} `}
+				onDragEnter={handleDrag}
+				onSubmit={(e) => {
+					e.preventDefault();
+				}}
+			>
+				<button id='file-input' onClick={handleButtonClick}>
+					<svg
+						xmlns='http://www.w3.org/2000/svg'
+						viewBox='0 0 24 24'
+						width='24'
+						height='24'
+					>
+						<path fill='none' d='M0 0h24v24H0z'></path>
+						<path
+							fill='currentColor'
+							d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'
+						></path>
+					</svg>
+					<span>Add</span>
+				</button>
+				<p className='text-sm'>Drag and Drop File here to upload.</p>
+				<input
+					className='hidden'
+					type='file'
+					onInput={handleImageInput}
+					accept='image/*'
+					ref={fileInputRef}
+				/>
+				{dragActive && (
+					<div
+						className='absolute inset-0 h-full w-full'
+						onDragEnd={handleDrag}
+						onDragLeave={handleDrag}
+						onDragOver={handleDrag}
+						onDrop={handleDrop}
+					></div>
+				)}
+			</form>
 			{imageData.compressedImageFile ? (
 				<>
 					<ImageCard
