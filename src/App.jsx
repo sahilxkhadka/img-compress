@@ -5,6 +5,7 @@ import ImageCard from "./components/ImageCard";
 
 function App() {
 	const [dragActive, setDragActive] = useState(false);
+	const [dragged, setDragged] = useState(false);
 	const [imageData, setImageData] = useState({
 		originalImageFile: "",
 		compressedImageFile: "",
@@ -37,14 +38,13 @@ function App() {
 					)
 				),
 			]);
-			setTimeout(() => {
-				setImageData({
-					...imageData,
-					compressedImageFile: compressedFile,
-					downloadLink: URL.createObjectURL(compressedFile),
-					compressing: false,
-				});
-			}, 2700);
+			setImageData({
+				...imageData,
+				compressedImageFile: compressedFile,
+				downloadLink: URL.createObjectURL(compressedFile),
+				compressing: false,
+			});
+			setDragged(false);
 		} catch (error) {
 			setImageData({
 				...imageData,
@@ -75,57 +75,65 @@ function App() {
 		if (e.type === "dragenter" || e.type === "dragover") {
 			setDragActive(true);
 		} else if (e.type === "dragleave") {
-			setDragActive(true);
+			setDragActive(false);
 		}
 	};
 
 	const handleDrop = (e) => {
+		setDragged(true);
+		const image = e.dataTransfer.files[0];
 		e.preventDefault();
 		e.stopPropagation();
+
 		setDragActive(false);
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-			compressImageInput(e.dataTransfer.files[0]);
+		if (e.dataTransfer.files && image) {
+			compressImageInput(image);
 		}
 	};
 
 	return (
 		<>
-			<h1 className='animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent text-[48px] font-black my-4'>
+			<h1 className='animate-text bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent text-[48px] font-black'>
 				Image Compressor
 			</h1>
-			<div className='flex'></div>
 			<form
-				className={`sm:w-96 sm:h-32 bg-gray-400 mx-auto my-4 rounded-lg relative flex flex-col justify-center items-center gap-2 ${
-					dragActive ? "bg-white" : "bg-gray-300"
-				} `}
+				className={`sm:w-96 sm:h-32 mx-auto my-4 rounded-lg relative `}
 				onDragEnter={handleDrag}
 				onSubmit={(e) => {
 					e.preventDefault();
 				}}
 			>
-				<button id='file-input' onClick={handleButtonClick}>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						viewBox='0 0 24 24'
-						width='24'
-						height='24'
-					>
-						<path fill='none' d='M0 0h24v24H0z'></path>
-						<path
-							fill='currentColor'
-							d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'
-						></path>
-					</svg>
-					<span>Add</span>
-				</button>
-				<p className='text-sm'>Drag and Drop File here to upload.</p>
-				<input
-					className='hidden'
-					type='file'
-					onInput={handleImageInput}
-					accept='image/*'
-					ref={fileInputRef}
-				/>
+				<label
+					className={` bg-transparent flex flex-col justify-center items-center w-full h-full rounded-lg transition-all ease-linear sm:border-2 border-dashed border-black ${
+						dragActive ? "bg-yellow-400" : "sm:bg-yellow-500"
+					}`}
+				>
+					<button id='file-input' onClick={handleButtonClick}>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							viewBox='0 0 24 24'
+							width='24'
+							height='24'
+						>
+							<path fill='none' d='M0 0h24v24H0z'></path>
+							<path
+								fill='currentColor'
+								d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'
+							></path>
+						</svg>
+						<span>Add</span>
+					</button>
+					<p className='hidden sm:block text-sm mt-2'>
+						Drag and Drop File here to upload.
+					</p>
+					<input
+						className='hidden'
+						type='file'
+						onInput={handleImageInput}
+						accept='image/*'
+						ref={fileInputRef}
+					/>
+				</label>
 				{dragActive && (
 					<div
 						className='absolute inset-0 h-full w-full'
@@ -136,12 +144,9 @@ function App() {
 					></div>
 				)}
 			</form>
-			{imageData.compressedImageFile ? (
+			{!dragged === true && imageData.compressedImageFile !== "" ? (
 				<>
-					<ImageCard
-						imageFile={imageData.compressedImageFile}
-						compressing={imageData.compressing}
-					/>
+					<ImageCard imageFile={imageData.compressedImageFile} />
 					<a
 						href={imageData.downloadLink}
 						download='compressed'
